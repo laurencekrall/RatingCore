@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using RatingCore.GoogleCP;
 
 namespace RatingCore.Api.Controllers
 {
@@ -10,6 +11,12 @@ namespace RatingCore.Api.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
+        IGoogleApiService _googleService;
+        public ValuesController(IGoogleApiService googleService)
+        {
+            _googleService = googleService;
+        }
+
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
@@ -22,6 +29,13 @@ namespace RatingCore.Api.Controllers
         public ActionResult<string> Get(int id)
         {
             return "value";
+        }
+
+        [HttpGet("DoIt")]
+        public ActionResult<string> DoIt()
+        {
+            var res = _googleService.GetSimilar();
+            return res;
         }
 
         // POST api/values

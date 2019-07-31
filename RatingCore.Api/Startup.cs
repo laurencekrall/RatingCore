@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RatingCore.Data.Models;
+using RatingCore.GoogleCP;
 
 namespace RatingCore.Api
 {
@@ -28,6 +29,8 @@ namespace RatingCore.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddScoped<IImageAnnotatorClientFactory, ImageAnnotatorClientFactory>();
+            services.AddScoped<IGoogleApiService, GoogleApiService>();
 
             services.AddDbContext<RatingCoreContext>
                 (options => options.UseLazyLoadingProxies().UseSqlServer(Configuration.GetConnectionString("RateCoffeeDb")));

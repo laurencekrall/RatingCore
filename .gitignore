@@ -260,3 +260,6 @@ paket-files/
 __pycache__/
 *.pyc
 /RatingCore.Api/Properties/PublishProfiles
+/RatingCore.Api/appsettings.Development.json
+/RatingCore.Api/token.json
+/RatingCore.Api/maddoggy.jpg
