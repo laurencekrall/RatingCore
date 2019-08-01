@@ -28,6 +28,9 @@ namespace RatingCore.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<GcpProjectInfo>(Configuration.GetSection(nameof(GcpProjectInfo)))
+                .AddSingleton<IGcpProjectInfo, GcpProjectInfo>(sp => sp.GetRequiredService<IOptions<GcpProjectInfo>>().Value);            
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddScoped<IImageAnnotatorClientFactory, ImageAnnotatorClientFactory>();
             services.AddScoped<IGoogleApiService, GoogleApiService>();
