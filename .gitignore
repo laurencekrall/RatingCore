@@ -261,5 +261,7 @@ __pycache__/
 *.pyc
 /RatingCore.Api/Properties/PublishProfiles
 /RatingCore.Api/appsettings.Development.json
+/RatingCore.Api/appsettings.Release.json
 /RatingCore.Api/token.json
 /RatingCore.Api/maddoggy.jpg
+/RatingCore.Api.Tests/BaseTests.cs

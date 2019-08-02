@@ -32,9 +32,9 @@ namespace RatingCore.Api.Controllers
         }
 
         [HttpGet("DoIt")]
-        public ActionResult<string> DoIt()
+        public ActionResult<string> DoIt(byte[] base64image)
         {
-            var res = _googleService.GetSimilar();
+            var res = _googleService.GetSimilar(base64image);
             return res;
         }
 

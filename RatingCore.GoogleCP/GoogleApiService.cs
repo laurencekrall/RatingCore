@@ -17,12 +17,12 @@ namespace RatingCore.GoogleCP
             _factory = factory;
             _projectInfo = projectInfo;
         }
-        public string GetSimilar()
+        public string GetSimilar(byte[] base64Image)
         {
             var client = _factory.GetClient();
-            var path = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, System.AppDomain.CurrentDomain.RelativeSearchPath ?? "");
 
-            Image image = Image.FromFile($"{path}\\maddoggy.jpg");
+            Image image = Image.FromBytes(base64Image);
+
             var opts = new GetSimilarProductsOptions()
             {
                 ComputeRegion = _projectInfo.ComputeRegion,

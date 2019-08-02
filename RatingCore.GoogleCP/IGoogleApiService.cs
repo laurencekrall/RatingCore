@@ -2,6 +2,6 @@
 {
     public interface IGoogleApiService
     {
-        string GetSimilar();
+        string GetSimilar(byte[] base64Image);
     }
 }
