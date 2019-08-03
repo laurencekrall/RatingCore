@@ -2,17 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Google.Cloud.Vision.V1;
 using Microsoft.AspNetCore.Mvc;
+using RatingCore.Api.DTO;
 using RatingCore.GoogleCP;
 
 namespace RatingCore.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ValuesController : ControllerBase
+    public class ImageController : ControllerBase
     {
         IGoogleApiService _googleService;
-        public ValuesController(IGoogleApiService googleService)
+        public ImageController(IGoogleApiService googleService)
         {
             _googleService = googleService;
         }
@@ -31,11 +33,19 @@ namespace RatingCore.Api.Controllers
             return "value";
         }
 
-        [HttpGet("DoIt")]
-        public ActionResult<string> DoIt(byte[] base64image)
+        [HttpPost("GetSimilar")]
+        public ActionResult<ProductSearchResults> GetSimilar([FromBody] ImageRequest imageRequest)
         {
-            var res = _googleService.GetSimilar(base64image);
-            return res;
+            var res = _googleService.GetSimilar(imageRequest.base64Image);
+            return Ok(res);
+        }
+
+
+        [HttpPost("Add")]
+        public async Task<ActionResult> Add([FromBody] AddImageRequest addImageRequest)
+        {
+            var res = await _googleService.AddImageToBucket(addImageRequest.base64Image, addImageRequest.Name);
+            return Ok(res);
         }
 
         // POST api/values

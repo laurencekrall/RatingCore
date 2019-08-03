@@ -8,5 +8,6 @@ namespace RatingCore.GoogleCP
     {
         public string ComputeRegion { get; set; }
         public string ProjectID { get; set; }
+        public string BucketName { get; set; }
     }
 }

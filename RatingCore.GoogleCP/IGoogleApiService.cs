@@ -1,7 +1,12 @@
-﻿namespace RatingCore.GoogleCP
+﻿using Google.Apis.Storage.v1.Data;
+using Google.Cloud.Vision.V1;
+using System.Threading.Tasks;
+
+namespace RatingCore.GoogleCP
 {
     public interface IGoogleApiService
     {
-        string GetSimilar(byte[] base64Image);
+        Task<ProductSearchResults> GetSimilar(byte[] base64Image);
+        Task<Object> AddImageToBucket(byte[] base64Image, string name);
     }
 }

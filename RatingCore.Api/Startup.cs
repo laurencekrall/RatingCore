@@ -32,7 +32,7 @@ namespace RatingCore.Api
                 .AddSingleton<IGcpProjectInfo, GcpProjectInfo>(sp => sp.GetRequiredService<IOptions<GcpProjectInfo>>().Value);            
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddScoped<IImageAnnotatorClientFactory, ImageAnnotatorClientFactory>();
+            services.AddScoped<IClientFactory, ClientFactory>();
             services.AddScoped<IGoogleApiService, GoogleApiService>();
 
             services.AddDbContext<RatingCoreContext>

@@ -1,25 +1,41 @@
 ﻿using Google.Cloud.Vision.V1;
+using Google.Cloud.Storage.V1;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
+using Object = Google.Apis.Storage.v1.Data.Object;
+using System.Threading.Tasks;
 
 namespace RatingCore.GoogleCP
 {
     public class GoogleApiService : IGoogleApiService
     {
-        IImageAnnotatorClientFactory _factory;
+        IClientFactory _factory;
         IGcpProjectInfo _projectInfo;
 
-        public GoogleApiService(IImageAnnotatorClientFactory factory, IGcpProjectInfo projectInfo)
+        public GoogleApiService(IClientFactory factory, IGcpProjectInfo projectInfo)
         {
             _factory = factory;
             _projectInfo = projectInfo;
         }
-        public string GetSimilar(byte[] base64Image)
+
+        public async Task<Object> AddImageToBucket(byte[] base64Image, string name)
         {
-            var client = _factory.GetClient();
+            var client = _factory.CreateStorageClient();
+
+            Stream stream = new MemoryStream(base64Image);
+
+            var res = await client.UploadObjectAsync(_projectInfo.BucketName, name, null, stream);
+
+            return res;
+        }
+
+        public async Task<ProductSearchResults> GetSimilar(byte[] base64Image)
+        {
+            var client = _factory.CreateImageAnnotatorClient();
 
             Image image = Image.FromBytes(base64Image);
 
@@ -42,9 +58,9 @@ namespace RatingCore.GoogleCP
             };
 
             // Search products similar to the image.
-            var results = client.DetectSimilarProducts(image, productSearchParams);
+            var results = await client.DetectSimilarProductsAsync(image, productSearchParams);
 
-            return JsonConvert.SerializeObject(results);
+            return results;
         }
     }
 
