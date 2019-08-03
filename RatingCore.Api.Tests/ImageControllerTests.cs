@@ -27,7 +27,7 @@ namespace Tests
                 ProjectID = _projectID
             });
             var controller = new ImageController(service);
-            var res = controller.GetSimilar(bytes);
+            var res = controller.GetSimilar( new ImageRequest() { base64Image = bytes });
             Assert.IsTrue(res.Value.Results.Any());
         }
 
