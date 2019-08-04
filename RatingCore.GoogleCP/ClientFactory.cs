@@ -21,7 +21,21 @@ namespace RatingCore.GoogleCP
 
             return imageAnnotatorClient;
         }
-        
+
+        public ProductSearchClient CreateProductSearchClient()
+        {
+            var path = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, System.AppDomain.CurrentDomain.RelativeSearchPath ?? "");
+            var credential = GoogleCredential.FromFile($"{path}\\token.json")
+               .CreateScoped(ProductSearchClient.DefaultScopes);
+            var channel = new Grpc.Core.Channel(
+                ProductSearchClient.DefaultEndpoint.ToString(),
+                credential.ToChannelCredentials());
+
+            var imageAnnotatorClient = ProductSearchClient.Create(channel);
+
+            return imageAnnotatorClient;
+        }
+
         public StorageClient CreateStorageClient()
         {
             var path = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, System.AppDomain.CurrentDomain.RelativeSearchPath ?? "");

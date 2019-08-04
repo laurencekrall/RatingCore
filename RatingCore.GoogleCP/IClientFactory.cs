@@ -7,5 +7,6 @@ namespace RatingCore.GoogleCP
     {
         ImageAnnotatorClient CreateImageAnnotatorClient();
         StorageClient CreateStorageClient();
+        ProductSearchClient CreateProductSearchClient();
     }
 }

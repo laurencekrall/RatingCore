@@ -33,6 +33,56 @@ namespace RatingCore.GoogleCP
             return res;
         }
 
+        public async Task<ReferenceImage> AddImageToProduct(byte[] base64Image, string fileName, 
+                                        string productName, string productID, string imageURL, string referenceImageID)
+        {
+            var client = _factory.CreateProductSearchClient();
+
+            var parent = new ProductName(_projectInfo.ProjectID,
+                                                      _projectInfo.ProjectID,
+                                                      productID);
+
+            var refImage = new ReferenceImage
+            {
+                Uri = imageURL
+            };
+
+            var request = new CreateReferenceImageRequest
+            {
+                // Get the full path of the product.
+                ParentAsProductName = parent,
+                ReferenceImageId = referenceImageID,
+                // Create a reference image.
+                ReferenceImage = refImage
+            };
+
+            var referenceImage = await client.CreateReferenceImageAsync(request);
+            return referenceImage;
+        }
+
+        public async Task<Product> CreateProduct(byte[] base64Image, string productName)
+        {
+            var client = _factory.CreateProductSearchClient();
+            var request = new CreateProductRequest
+            {
+                // A resource that represents Google Cloud Platform location.
+                ParentAsLocationName = new LocationName(_projectInfo.ProjectID,
+                                                        _projectInfo.ComputeRegion),
+                // Set product category and product display name
+                Product = new Product
+                {
+                    DisplayName = productName,
+                    ProductCategory = ""
+                },
+                //ProductId = opts.ProductID
+            };
+
+            // The response is the product with the `name` field populated.
+            var product = await client.CreateProductAsync(request);
+
+            return product;
+        }
+
         public async Task<ProductSearchResults> GetSimilar(byte[] base64Image)
         {
             var client = _factory.CreateImageAnnotatorClient();
