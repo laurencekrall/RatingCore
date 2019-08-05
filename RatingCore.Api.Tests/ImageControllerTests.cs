@@ -44,8 +44,9 @@ namespace Tests
                 BucketName = _bucketName
             });
             var controller = new ImageController(service);
-            var dto = new AddImageRequest() { base64Image = bytes, Name = "MadDog12345" };
-            var res = controller.Add(dto).Result;
+            var dto = new CreateRateableRequest() { base64Image = bytes, Name = "MadDog12345" };
+
+            var res = controller.CreateNewRateable(dto).Result;
             Assert.IsTrue( ((OkObjectResult)res).StatusCode == 200 );
         }
     }

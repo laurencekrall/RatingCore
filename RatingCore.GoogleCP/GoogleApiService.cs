@@ -22,7 +22,15 @@ namespace RatingCore.GoogleCP
             _projectInfo = projectInfo;
         }
 
-        public async Task<Object> AddImageToBucket(byte[] base64Image, string name)
+        public async Task<bool> CreateNewRateable(Rateable item)
+        {
+            var addImage = await AddImageToBucket(item.Base64Image, item.FileName);
+            var makeProduct = await CreateProduct(item.ProductName);
+            var combine = await AddImageToProduct(makeProduct.Name, addImage.Id);
+            return true;
+        }
+
+        private async Task<Object> AddImageToBucket(byte[] base64Image, string name)
         {
             var client = _factory.CreateStorageClient();
 
@@ -33,8 +41,28 @@ namespace RatingCore.GoogleCP
             return res;
         }
 
-        public async Task<ReferenceImage> AddImageToProduct(byte[] base64Image, string fileName, 
-                                        string productName, string productID, string imageURL, string referenceImageID)
+        private async Task<Product> CreateProduct(string productName)
+        {
+            var client = _factory.CreateProductSearchClient();
+            var request = new CreateProductRequest
+            {
+                ParentAsLocationName = new LocationName(_projectInfo.ProjectID,
+                                                        _projectInfo.ComputeRegion),
+                Product = new Product
+                {
+                    DisplayName = productName,
+                    ProductCategory = "packagedgoods-v1"
+                },
+                //ProductId = opts.ProductID
+            };
+
+            // The response is the product with the `name` field populated.
+            var product = await client.CreateProductAsync(request);
+
+            return product;
+        }
+
+        private async Task<ReferenceImage> AddImageToProduct(string productID, string imageURL)
         {
             var client = _factory.CreateProductSearchClient();
 
@@ -51,36 +79,13 @@ namespace RatingCore.GoogleCP
             {
                 // Get the full path of the product.
                 ParentAsProductName = parent,
-                ReferenceImageId = referenceImageID,
+                //ReferenceImageId = referenceImageID,
                 // Create a reference image.
                 ReferenceImage = refImage
             };
 
             var referenceImage = await client.CreateReferenceImageAsync(request);
             return referenceImage;
-        }
-
-        public async Task<Product> CreateProduct(byte[] base64Image, string productName)
-        {
-            var client = _factory.CreateProductSearchClient();
-            var request = new CreateProductRequest
-            {
-                // A resource that represents Google Cloud Platform location.
-                ParentAsLocationName = new LocationName(_projectInfo.ProjectID,
-                                                        _projectInfo.ComputeRegion),
-                // Set product category and product display name
-                Product = new Product
-                {
-                    DisplayName = productName,
-                    ProductCategory = ""
-                },
-                //ProductId = opts.ProductID
-            };
-
-            // The response is the product with the `name` field populated.
-            var product = await client.CreateProductAsync(request);
-
-            return product;
         }
 
         public async Task<ProductSearchResults> GetSimilar(byte[] base64Image)

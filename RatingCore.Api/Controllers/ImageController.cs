@@ -42,9 +42,16 @@ namespace RatingCore.Api.Controllers
 
 
         [HttpPost("Add")]
-        public async Task<ActionResult> Add([FromBody] AddImageRequest addImageRequest)
+        public async Task<ActionResult> CreateNewRateable([FromBody] CreateRateableRequest ratable)
         {
-            var res = await _googleService.AddImageToBucket(addImageRequest.base64Image, addImageRequest.Name);
+            var rate = new Rateable()
+            {
+               Base64Image = ratable.base64Image,
+               FileName = ratable.FileName,
+               ProductName = ratable.Name
+            };
+            var res = await _googleService.CreateNewRateable(rate);
+            
             return Ok(res);
         }
 

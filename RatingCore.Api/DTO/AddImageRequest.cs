@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 
 namespace RatingCore.Api.DTO
 {
-    public class AddImageRequest : ImageRequest
+    public class CreateRateableRequest : ImageRequest
     {
         public string Name { get; set; }
+        public string FileName { get; internal set; }
     }
 }
