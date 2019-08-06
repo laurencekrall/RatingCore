@@ -26,7 +26,8 @@ namespace RatingCore.GoogleCP
         {
             var addImage = await AddImageToBucket(item.Base64Image, item.FileName);
             var makeProduct = await CreateProduct(item.ProductName);
-            var combine = await AddImageToProduct(makeProduct.Name, addImage.Id);
+            var bucketFileLocation = $"gs://{_projectInfo.BucketName}/{item.FileName}";
+            var combine = await AddImageToProduct(item.ProductName, bucketFileLocation, item.FileName);
             return true;
         }
 
@@ -53,7 +54,7 @@ namespace RatingCore.GoogleCP
                     DisplayName = productName,
                     ProductCategory = "packagedgoods-v1"
                 },
-                //ProductId = opts.ProductID
+                ProductId = productName
             };
 
             // The response is the product with the `name` field populated.
@@ -62,12 +63,12 @@ namespace RatingCore.GoogleCP
             return product;
         }
 
-        private async Task<ReferenceImage> AddImageToProduct(string productID, string imageURL)
+        private async Task<ReferenceImage> AddImageToProduct(string productID, string imageURL, string referenceImageID)
         {
             var client = _factory.CreateProductSearchClient();
 
             var parent = new ProductName(_projectInfo.ProjectID,
-                                                      _projectInfo.ProjectID,
+                                                      _projectInfo.ComputeRegion,
                                                       productID);
 
             var refImage = new ReferenceImage
@@ -79,7 +80,7 @@ namespace RatingCore.GoogleCP
             {
                 // Get the full path of the product.
                 ParentAsProductName = parent,
-                //ReferenceImageId = referenceImageID,
+                ReferenceImageId = referenceImageID,
                 // Create a reference image.
                 ReferenceImage = refImage
             };

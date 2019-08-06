@@ -8,6 +8,6 @@ namespace RatingCore.Api.DTO
     public class CreateRateableRequest : ImageRequest
     {
         public string Name { get; set; }
-        public string FileName { get; internal set; }
+        public string FileName { get; set; }
     }
 }
