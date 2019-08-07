@@ -27,7 +27,7 @@ namespace Tests
                 ProjectID = _projectID
             });
             var controller = new ImageController(service);
-            var res = controller.GetSimilar( new ImageRequest() { base64Image = bytes });
+            var res = controller.GetSimilar( new ImageRequest() { Base64Image = bytes });
             Assert.IsTrue(res.Value.Results.Any());
         }
 
@@ -44,7 +44,7 @@ namespace Tests
                 BucketName = _bucketName
             });
             var controller = new ImageController(service);
-            var dto = new CreateRateableRequest() { base64Image = bytes, Name = "MadDog12345", FileName = "MadDog12345.png" };
+            var dto = new CreateRateableRequest() { Base64Image = bytes, Name = "MadDog12345", FileName = "MadDog12345.png" };
 
             var res = controller.CreateNewRateable(dto).Result;
             Assert.IsTrue( ((OkObjectResult)res).StatusCode == 200 );

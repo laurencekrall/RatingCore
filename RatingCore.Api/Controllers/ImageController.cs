@@ -36,7 +36,7 @@ namespace RatingCore.Api.Controllers
         [HttpPost("GetSimilar")]
         public ActionResult<ProductSearchResults> GetSimilar([FromBody] ImageRequest imageRequest)
         {
-            var res = _googleService.GetSimilar(imageRequest.base64Image);
+            var res = _googleService.GetSimilar(imageRequest.Base64Image);
             return Ok(res);
         }
 
@@ -46,7 +46,7 @@ namespace RatingCore.Api.Controllers
         {
             var rate = new Rateable()
             {
-               Base64Image = ratable.base64Image,
+               Base64Image = ratable.Base64Image,
                FileName = ratable.FileName,
                ProductName = ratable.Name
             };

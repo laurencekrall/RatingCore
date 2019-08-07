@@ -12,6 +12,8 @@ namespace RatingCore.Data.Models
         { }
 
         public DbSet<Rating> Ratings { get; set; }
+        public DbSet<Product> Products { get; set; }
+
     }
 
 }

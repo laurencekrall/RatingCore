@@ -7,6 +7,6 @@ namespace RatingCore.Api.DTO
 {
     public class ImageRequest
     {
-        public byte[] base64Image { get; set; }
+        public byte[] Base64Image { get; set; }
     }
 }
