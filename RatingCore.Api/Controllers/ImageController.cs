@@ -34,9 +34,9 @@ namespace RatingCore.Api.Controllers
         }
 
         [HttpPost("GetSimilar")]
-        public ActionResult<ProductSearchResults> GetSimilar([FromBody] ImageRequest imageRequest)
+        public async Task<ActionResult<ProductSearchResults>> GetSimilar([FromBody] ImageRequest imageRequest)
         {
-            var res = _googleService.GetSimilar(imageRequest.Base64Image);
+            var res = await _googleService.GetSimilarAsync(imageRequest.Base64Image);
             return Ok(res);
         }
 

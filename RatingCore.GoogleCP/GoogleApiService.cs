@@ -28,6 +28,7 @@ namespace RatingCore.GoogleCP
             var makeProduct = await CreateProduct(item.ProductName);
             var bucketFileLocation = $"gs://{_projectInfo.BucketName}/{item.FileName}";
             var combine = await AddImageToProduct(item.ProductName, bucketFileLocation, item.FileName);
+            var addToSet = await AddProductToProductSet(item.ProductName);
             return true;
         }
 
@@ -89,7 +90,29 @@ namespace RatingCore.GoogleCP
             return referenceImage;
         }
 
-        public async Task<ProductSearchResults> GetSimilar(byte[] base64Image)
+        private async Task<bool> AddProductToProductSet(string productID)
+        {
+            var client = _factory.CreateProductSearchClient();
+
+            var request = new AddProductToProductSetRequest
+            {
+                ProductAsProductName = new ProductName(_projectInfo.ProjectID,
+                                                      _projectInfo.ComputeRegion,
+                                                      productID),
+
+                ProductSetName = new ProductSetName(_projectInfo.ProjectID,
+                                                   _projectInfo.ComputeRegion,
+                                                   "1"),
+            };
+
+            await client.AddProductToProductSetAsync(request);
+
+            Console.WriteLine("Product added to product set.");
+
+            return true;
+        }
+
+        public async Task<ProductSearchResults> GetSimilarAsync(byte[] base64Image)
         {
             var client = _factory.CreateImageAnnotatorClient();
 

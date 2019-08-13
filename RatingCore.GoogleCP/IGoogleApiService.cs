@@ -6,7 +6,7 @@ namespace RatingCore.GoogleCP
 {
     public interface IGoogleApiService
     {
-        Task<ProductSearchResults> GetSimilar(byte[] base64Image);
+        Task<ProductSearchResults> GetSimilarAsync(byte[] base64Image);
         Task<bool> CreateNewRateable(Rateable item);
     }
 }
