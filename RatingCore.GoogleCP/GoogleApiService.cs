@@ -13,12 +13,12 @@ namespace RatingCore.GoogleCP
 {
     public class GoogleApiService : IGoogleApiService
     {
-        IClientFactory _factory;
+        IClientFactory _clientFactory;
         IGcpProjectInfo _projectInfo;
 
-        public GoogleApiService(IClientFactory factory, IGcpProjectInfo projectInfo)
+        public GoogleApiService(IClientFactory clientFactory, IGcpProjectInfo projectInfo)
         {
-            _factory = factory;
+            _clientFactory = clientFactory;
             _projectInfo = projectInfo;
         }
 
@@ -34,7 +34,7 @@ namespace RatingCore.GoogleCP
 
         private async Task<Object> AddImageToBucket(byte[] base64Image, string name)
         {
-            var client = _factory.CreateStorageClient();
+            var client = _clientFactory.CreateStorageClient();
 
             Stream stream = new MemoryStream(base64Image);
 
@@ -45,7 +45,7 @@ namespace RatingCore.GoogleCP
 
         private async Task<Product> CreateProduct(string productName)
         {
-            var client = _factory.CreateProductSearchClient();
+            var client = _clientFactory.CreateProductSearchClient();
             var request = new CreateProductRequest
             {
                 ParentAsLocationName = new LocationName(_projectInfo.ProjectID,
@@ -66,7 +66,7 @@ namespace RatingCore.GoogleCP
 
         private async Task<ReferenceImage> AddImageToProduct(string productID, string imageURL, string referenceImageID)
         {
-            var client = _factory.CreateProductSearchClient();
+            var client = _clientFactory.CreateProductSearchClient();
 
             var parent = new ProductName(_projectInfo.ProjectID,
                                                       _projectInfo.ComputeRegion,
@@ -92,7 +92,7 @@ namespace RatingCore.GoogleCP
 
         private async Task<bool> AddProductToProductSet(string productID)
         {
-            var client = _factory.CreateProductSearchClient();
+            var client = _clientFactory.CreateProductSearchClient();
 
             var request = new AddProductToProductSetRequest
             {
@@ -114,7 +114,7 @@ namespace RatingCore.GoogleCP
 
         public async Task<ProductSearchResults> GetSimilarAsync(byte[] base64Image)
         {
-            var client = _factory.CreateImageAnnotatorClient();
+            var client = _clientFactory.CreateImageAnnotatorClient();
 
             Image image = Image.FromBytes(base64Image);
 
