@@ -3,7 +3,9 @@ using NUnit.Framework;
 using RatingCore.Api.Controllers;
 using RatingCore.Api.DTO;
 using RatingCore.GoogleCP;
+using RatingCore.GoogleCP.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Tests
@@ -27,8 +29,11 @@ namespace Tests
                 ProjectID = _projectID
             });
             var controller = new ImageController(service);
-            var res = controller.GetSimilar( new ImageRequest() { Base64Image = bytes }).Result;
-            Assert.IsTrue(res.Value.Results.Any());
+            OkObjectResult res = (OkObjectResult)(controller.GetSimilar( new ImageRequest() { Base64Image = bytes }).Result);
+            var data = res.Value as List<ProductSearchResult>;
+
+            Assert.IsTrue(data != null);
+            Assert.IsTrue(data.Any());
         }
 
         [Test]

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace RatingCore.Api.DTO
 {
-    public class RateImageRequest : ImageRequest
+    public class RateProductRequest
     {
         public double Rating { get; set; }
     }

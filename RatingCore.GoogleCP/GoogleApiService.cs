@@ -8,6 +8,8 @@ using System.IO;
 using System.Text;
 using Object = Google.Apis.Storage.v1.Data.Object;
 using System.Threading.Tasks;
+using RatingCore.GoogleCP.Models;
+using System.Linq;
 
 namespace RatingCore.GoogleCP
 {
@@ -112,34 +114,59 @@ namespace RatingCore.GoogleCP
             return true;
         }
 
-        public async Task<ProductSearchResults> GetSimilarAsync(byte[] base64Image)
+        public async Task<List<ProductSearchResult>> GetSimilarAsync(byte[] base64Image)
         {
             var client = _clientFactory.CreateImageAnnotatorClient();
+            var productClient = _clientFactory.CreateProductSearchClient();
 
             Image image = Image.FromBytes(base64Image);
 
-            var opts = new GetSimilarProductsOptions()
-            {
-                ComputeRegion = _projectInfo.ComputeRegion,
-                ProjectID = _projectInfo.ProjectID,
-                ProductSetId = "1",
-                Filter = "",
-                ProductCategory = "packagedgoods-v1",
-            };
-
             var productSearchParams = new ProductSearchParams
             {
-                ProductSetAsProductSetName = new ProductSetName(opts.ProjectID,
-                                                               opts.ComputeRegion,
-                                                               opts.ProductSetId),
-                ProductCategories = { opts.ProductCategory },
-                Filter = opts.Filter
+                ProductSetAsProductSetName = new ProductSetName(_projectInfo.ProjectID,
+                                                               _projectInfo.ComputeRegion,
+                                                               "1"),
+                ProductCategories = { "packagedgoods-v1" },
+                Filter = ""
             };
 
             // Search products similar to the image.
-            var results = await client.DetectSimilarProductsAsync(image, productSearchParams);
+            var detectSimilar = await client.DetectSimilarProductsAsync(image, productSearchParams);
 
-            return results;
+            var mapped =  detectSimilar.Results.Select(async x => 
+            {
+                var item = new ProductSearchResult()
+                {
+                    Score = x.Score,
+                    ProductName = x.Product.Name.Split("/").Last(),
+                };
+
+                if (x.Score > 0.6)
+                {
+                    item.ReferenceImages = (await ListReferenceImagesOfProduct(productClient, item.ProductName)).ToList();
+                }
+                return item;
+            }).ToList();
+
+            var results = await Task.WhenAll(mapped);
+
+            return results.ToList();
+        }
+
+        private async Task<IEnumerable<string>> ListReferenceImagesOfProduct(ProductSearchClient client, string productID)
+        {
+            var request = new ListReferenceImagesRequest
+            {
+                ParentAsProductName = new ProductName(_projectInfo.ProjectID,
+                                                      _projectInfo.ComputeRegion,
+                                                      productID)
+            };
+
+            var res = client.ListReferenceImagesAsync(request);
+
+            var results = await res.ToList();
+
+            return results.Select(x => x.Uri.Replace("gs://", "https://storage.cloud.google.com/"));            
         }
     }
 

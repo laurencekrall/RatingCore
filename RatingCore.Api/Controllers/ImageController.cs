@@ -6,6 +6,7 @@ using Google.Cloud.Vision.V1;
 using Microsoft.AspNetCore.Mvc;
 using RatingCore.Api.DTO;
 using RatingCore.GoogleCP;
+using RatingCore.GoogleCP.Models;
 
 namespace RatingCore.Api.Controllers
 {
@@ -34,12 +35,19 @@ namespace RatingCore.Api.Controllers
         }
 
         [HttpPost("GetSimilar")]
-        public async Task<ActionResult<ProductSearchResults>> GetSimilar([FromBody] ImageRequest imageRequest)
+        public async Task<ActionResult> GetSimilar([FromBody] ImageRequest imageRequest)
         {
-            var res = await _googleService.GetSimilarAsync(imageRequest.Base64Image);
-            return Ok(res);
+            List<ProductSearchResult> getSimilar = await _googleService.GetSimilarAsync(imageRequest.Base64Image);
+            return Ok(getSimilar);
         }
 
+
+        //[HttpPost("Rate/{productName}")]
+        //public async Task<ActionResult> Rate(string productName, [FromBody] RateProductRequest imageRequest)
+        //{
+        //    List<ProductSearchResult> getSimilar = await _googleService.GetSimilarAsync(imageRequest.Base64Image);
+        //    return Ok(getSimilar);
+        //}
 
         [HttpPost("Add")]
         public async Task<ActionResult> CreateNewRateable([FromBody] CreateRateableRequest ratable)
