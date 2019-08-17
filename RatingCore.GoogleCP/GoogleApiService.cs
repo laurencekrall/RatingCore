@@ -40,7 +40,7 @@ namespace RatingCore.GoogleCP
 
             Stream stream = new MemoryStream(base64Image);
 
-            var res = await client.UploadObjectAsync(_projectInfo.BucketName, name, null, stream);
+            var res = await client.UploadObjectAsync(_projectInfo.BucketName, name, "image/png", stream);
 
             return res;
         }

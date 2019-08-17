@@ -5,6 +5,7 @@ namespace RatingCore.Data.Models
     public class Product
     {
         public int ProductId { get; set; }
-        public virtual IEnumerable<Rating> Rating { get; set; }
+        public string ProductName { get; set; }
+        public virtual List<Rating> Rating { get; set; }
     }
 }

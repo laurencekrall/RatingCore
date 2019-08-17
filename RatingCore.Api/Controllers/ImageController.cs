@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Google.Cloud.Vision.V1;
 using Microsoft.AspNetCore.Mvc;
 using RatingCore.Api.DTO;
+using RatingCore.Data.Models;
 using RatingCore.GoogleCP;
 using RatingCore.GoogleCP.Models;
 
@@ -15,9 +16,12 @@ namespace RatingCore.Api.Controllers
     public class ImageController : ControllerBase
     {
         IGoogleApiService _googleService;
-        public ImageController(IGoogleApiService googleService)
+        RatingCoreContext _ratingCoreContext;
+
+        public ImageController(IGoogleApiService googleService, RatingCoreContext ratingCoreContext)
         {
             _googleService = googleService;
+            _ratingCoreContext = ratingCoreContext;
         }
 
         // GET api/values
@@ -37,17 +41,34 @@ namespace RatingCore.Api.Controllers
         [HttpPost("GetSimilar")]
         public async Task<ActionResult> GetSimilar([FromBody] ImageRequest imageRequest)
         {
-            List<ProductSearchResult> getSimilar = await _googleService.GetSimilarAsync(imageRequest.Base64Image);
-            return Ok(getSimilar);
+            List<GoogleCP.Models.ProductSearchResult> getSimilar = await _googleService.GetSimilarAsync(imageRequest.Base64Image);
+
+            var ratings = _ratingCoreContext.Products.Where(x => getSimilar.Select(y => y.ProductName.ToUpper()).Contains(x.ProductName.ToUpper())).ToList();
+
+            var mapped = getSimilar.Select(x => new DTO.ProductSearchResult()
+            {
+                ProductName = x.ProductName,
+                ReferenceImages = x.ReferenceImages,
+                Score = x.Score,
+                Ratings = ratings.FirstOrDefault(y => y.ProductName.ToUpper() == x.ProductName.ToUpper())?.Rating.Select(z => z.Value).ToList()
+            });
+
+            return Ok(mapped);
         }
 
 
-        //[HttpPost("Rate/{productName}")]
-        //public async Task<ActionResult> Rate(string productName, [FromBody] RateProductRequest imageRequest)
-        //{
-        //    List<ProductSearchResult> getSimilar = await _googleService.GetSimilarAsync(imageRequest.Base64Image);
-        //    return Ok(getSimilar);
-        //}
+        [HttpPost("Rate/{productName}")]
+        public async Task<ActionResult> Rate(string productName, [FromBody] RateProductRequest imageRequest)
+        {
+
+            var product = _ratingCoreContext.Products.FirstOrDefault(x => x.ProductName == productName);
+            product.Rating.Add(new Rating()
+            {
+                Value = imageRequest.Rating
+            });
+            await _ratingCoreContext.SaveChangesAsync();
+            return Ok();
+        }
 
         [HttpPost("Add")]
         public async Task<ActionResult> CreateNewRateable([FromBody] CreateRateableRequest ratable)
@@ -59,7 +80,18 @@ namespace RatingCore.Api.Controllers
                ProductName = ratable.Name
             };
             var res = await _googleService.CreateNewRateable(rate);
-            
+
+            var product = new Data.Models.Product()
+            {
+                ProductName = ratable.Name,
+                Rating = new List<Rating>() { }
+            };
+            product.Rating.Add(new Rating()
+            {
+                Value = ratable.Rating
+            });
+            await _ratingCoreContext.SaveChangesAsync();
+
             return Ok(res);
         }
 

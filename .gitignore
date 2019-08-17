@@ -265,3 +265,4 @@ __pycache__/
 /RatingCore.Api/token.json
 /RatingCore.Api/maddoggy.jpg
 /RatingCore.Api.Tests/BaseTests.cs
+/RatingCore.Api.Tests/token.json
