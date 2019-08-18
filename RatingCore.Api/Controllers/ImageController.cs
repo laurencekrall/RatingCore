@@ -75,9 +75,9 @@ namespace RatingCore.Api.Controllers
         {
             var rate = new Rateable()
             {
-               Base64Image = ratable.Base64Image,
-               FileName = ratable.FileName,
-               ProductName = ratable.Name
+                Base64Image = ratable.Base64Image,
+                FileName = ratable.FileName,
+                ProductName = ratable.Name
             };
             var res = await _googleService.CreateNewRateable(rate);
 
@@ -90,9 +90,10 @@ namespace RatingCore.Api.Controllers
             {
                 Value = ratable.Rating
             });
-            await _ratingCoreContext.SaveChangesAsync();
+            _ratingCoreContext.Products.Add(product);
+            int saved = _ratingCoreContext.SaveChanges();
 
-            return Ok(res);
+            return Ok(product.ProductId);
         }
 
         // POST api/values
