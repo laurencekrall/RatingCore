@@ -166,7 +166,7 @@ namespace RatingCore.GoogleCP
 
             var results = await res.ToList();
 
-            return results.Select(x => x.Uri.Replace("gs://", "https://storage.cloud.google.com/"));            
+            return results.Select(x => x.Uri.Replace("gs://", "https://storage.googleapis.com/"));            
         }
     }
 
