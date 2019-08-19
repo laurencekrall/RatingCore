@@ -42,10 +42,11 @@ namespace RatingCore.Api.Controllers
         public async Task<ActionResult> GetSimilar([FromBody] ImageRequest imageRequest)
         {
             List<GoogleCP.Models.ProductSearchResult> getSimilar = await _googleService.GetSimilarAsync(imageRequest.Base64Image);
+            var filtered = getSimilar.Where(x => x.Score > 0.6);
 
-            var products = _ratingCoreContext.Products.Where(x => getSimilar.Select(y => y.ProductName.ToUpper()).Contains(x.ProductName.ToUpper())).ToList();
+            var products = _ratingCoreContext.Products.Where(x => filtered.Select(y => y.ProductName.ToUpper()).Contains(x.ProductName.ToUpper())).ToList();
 
-            var mapped = getSimilar.Select(x =>
+            var mapped = filtered.Select(x =>
             {
                 var product = products.FirstOrDefault(y => y.ProductName.ToUpper() == x.ProductName.ToUpper());
                 return new DTO.ProductSearchResult()
@@ -54,7 +55,7 @@ namespace RatingCore.Api.Controllers
                     ReferenceImages = x.ReferenceImages,
                     Score = x.Score,
                     Ratings = product?.Rating.Select(z => z.Value).ToList(),
-                    Id = product.ProductId
+                    Id = product?.ProductId ?? 0
                 };
             }
             );
