@@ -43,15 +43,21 @@ namespace RatingCore.Api.Controllers
         {
             List<GoogleCP.Models.ProductSearchResult> getSimilar = await _googleService.GetSimilarAsync(imageRequest.Base64Image);
 
-            var ratings = _ratingCoreContext.Products.Where(x => getSimilar.Select(y => y.ProductName.ToUpper()).Contains(x.ProductName.ToUpper())).ToList();
+            var products = _ratingCoreContext.Products.Where(x => getSimilar.Select(y => y.ProductName.ToUpper()).Contains(x.ProductName.ToUpper())).ToList();
 
-            var mapped = getSimilar.Select(x => new DTO.ProductSearchResult()
+            var mapped = getSimilar.Select(x =>
             {
-                ProductName = x.ProductName,
-                ReferenceImages = x.ReferenceImages,
-                Score = x.Score,
-                Ratings = ratings.FirstOrDefault(y => y.ProductName.ToUpper() == x.ProductName.ToUpper())?.Rating.Select(z => z.Value).ToList()
-            });
+                var product = products.FirstOrDefault(y => y.ProductName.ToUpper() == x.ProductName.ToUpper());
+                return new DTO.ProductSearchResult()
+                {
+                    ProductName = x.ProductName,
+                    ReferenceImages = x.ReferenceImages,
+                    Score = x.Score,
+                    Ratings = product?.Rating.Select(z => z.Value).ToList(),
+                    Id = product.ProductId
+                };
+            }
+            );
 
             return Ok(mapped);
         }
