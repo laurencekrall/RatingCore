@@ -57,11 +57,15 @@ namespace RatingCore.Api.Controllers
         }
 
 
-        [HttpPost("Rate/{productName}")]
-        public async Task<ActionResult> Rate(string productName, [FromBody] RateProductRequest imageRequest)
+        [HttpPost("Rate/{productId}")]
+        public async Task<ActionResult> Rate(int productId, [FromBody] RateProductRequest imageRequest)
         {
 
-            var product = _ratingCoreContext.Products.FirstOrDefault(x => x.ProductName == productName);
+            var product = _ratingCoreContext.Products.FirstOrDefault(x => x.ProductId == productId);
+            if(product == null)
+            {
+                return NotFound("No product with this id");
+            }
             product.Rating.Add(new Rating()
             {
                 Value = imageRequest.Rating
